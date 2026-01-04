@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RideEZ - Bike Pooling Platform</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Login/Register Section -->
+        <div id="auth-container" class="auth-container">
+            <div class="auth-card">
+                <div class="auth-header">
+                    <h1><i class="fas fa-motorcycle"></i> RideEZ</h1>
+                    <p>Bike Pooling & Ride Sharing</p>
+                </div>
+                
+                <!-- Login Form -->
+                <div id="login-form" class="auth-form active">
+                    <h2>Login</h2>
+                    <form id="loginForm">
+                        <div class="form-group">
+                            <label><i class="fas fa-phone"></i> Phone or Email</label>
+                            <input type="text" id="loginPhone" required>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-lock"></i> Password</label>
+                            <input type="password" id="loginPassword" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Login</button>
+                    </form>
+                    <p class="auth-switch">Don't have an account? <a href="#" id="showRegister">Register</a></p>
+                </div>
+
+                <!-- Register Form -->
+                <div id="register-form" class="auth-form">
+                    <h2>Register</h2>
+                    <form id="registerForm">
+                        <div class="form-group">
+                            <label><i class="fas fa-user"></i> Name</label>
+                            <input type="text" id="regName" required>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-phone"></i> Phone</label>
+                            <input type="tel" id="regPhone" required>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-envelope"></i> Email (Optional)</label>
+                            <input type="email" id="regEmail">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-lock"></i> Password</label>
+                            <input type="password" id="regPassword" required>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-user-tag"></i> Role</label>
+                            <select id="regRole" required>
+                                <option value="RIDER">Rider (Offer Rides)</option>
+                                <option value="PASSENGER">Passenger (Find Rides)</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Register</button>
+                    </form>
+                    <p class="auth-switch">Already have an account? <a href="#" id="showLogin">Login</a></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Application (Hidden initially) -->
+        <div id="main-app" class="main-app hidden">
+            <!-- Navigation -->
+            <nav class="navbar">
+                <div class="nav-brand">
+                    <i class="fas fa-motorcycle"></i> RideEZ
+                </div>
+                <div class="nav-menu">
+                    <button id="navDashboard" class="nav-btn active"><i class="fas fa-home"></i> Dashboard</button>
+                    <button id="navRides" class="nav-btn"><i class="fas fa-route"></i> My Rides</button>
+                    <button id="navBookings" class="nav-btn"><i class="fas fa-ticket-alt"></i> Bookings</button>
+                </div>
+                <div class="nav-user">
+                    <span id="userName"></span>
+                    <button id="logoutBtn" class="btn btn-sm btn-danger">Logout</button>
+                </div>
+            </nav>
+
+            <!-- Dashboard (Rider/Passenger specific) -->
+            <div id="dashboard" class="dashboard-container">
+                <!-- Rider Dashboard -->
+                <div id="rider-dashboard" class="dashboard hidden">
+                    <div class="dashboard-header">
+                        <h2><i class="fas fa-motorcycle"></i> Rider Dashboard</h2>
+                        <button id="createRideBtn" class="btn btn-primary"><i class="fas fa-plus"></i> Create Ride</button>
+                    </div>
+                    <div id="rider-map-container" class="map-container">
+                        <div id="rider-map"></div>
+                    </div>
+                    <div id="rider-rides-list" class="rides-list"></div>
+                </div>
+
+                <!-- Passenger Dashboard -->
+                <div id="passenger-dashboard" class="dashboard hidden">
+                    <div class="dashboard-header">
+                        <h2><i class="fas fa-search"></i> Find Rides</h2>
+                        <div class="search-controls">
+                            <input type="date" id="searchDate" class="form-control">
+                            <button id="searchRidesBtn" class="btn btn-primary"><i class="fas fa-search"></i> Search</button>
+                        </div>
+                    </div>
+                    <div id="passenger-map-container" class="map-container">
+                        <div id="passenger-map"></div>
+                    </div>
+                    <div id="available-rides-list" class="rides-list"></div>
+                </div>
+            </div>
+
+            <!-- Create Ride Modal -->
+            <div id="createRideModal" class="modal hidden">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <h2>Create New Ride</h2>
+                    <form id="createRideForm">
+                        <div class="form-group">
+                            <label>Source Location</label>
+                            <div id="source-map" class="mini-map"></div>
+                            <input type="text" id="sourceAddress" placeholder="Source Address" class="form-control">
+                            <input type="hidden" id="sourceLat">
+                            <input type="hidden" id="sourceLng">
+                            <button type="button" id="pickSource" class="btn btn-sm btn-secondary">Pick on Map</button>
+                        </div>
+                        <div class="form-group">
+                            <label>Destination Location</label>
+                            <div id="dest-map" class="mini-map"></div>
+                            <input type="text" id="destAddress" placeholder="Destination Address" class="form-control">
+                            <input type="hidden" id="destLat">
+                            <input type="hidden" id="destLng">
+                            <button type="button" id="pickDest" class="btn btn-sm btn-secondary">Pick on Map</button>
+                        </div>
+                        <div class="form-group">
+                            <label>Date & Time</label>
+                            <input type="datetime-local" id="rideDateTime" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Price (₹)</label>
+                            <input type="number" id="ridePrice" class="form-control" step="0.01" min="0" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Create Ride</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Ride Details Modal -->
+            <div id="rideDetailsModal" class="modal hidden">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <div id="rideDetailsContent"></div>
+                </div>
+            </div>
+
+            <!-- Active Ride Control (For Rider) -->
+            <div id="activeRideControl" class="active-ride-control hidden">
+                <div class="active-ride-info">
+                    <h3>Active Ride</h3>
+                    <p id="activeRideInfo"></p>
+                </div>
+                <div class="active-ride-actions">
+                    <button id="endRideBtn" class="btn btn-danger">End Ride</button>
+                    <button id="sosBtn" class="btn btn-sos"><i class="fas fa-exclamation-triangle"></i> SOS</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK - Load before other scripts -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    
+    <script src="js/config.js"></script>
+    <script src="js/firebase.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/maps.js"></script>
+    <script src="js/app.js"></script>
+    
+    <!-- Google Maps API - Replace YOUR_API_KEY with your actual key -->
+    <script>
+        // Initialize Firebase on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof firebase !== 'undefined' && CONFIG.FIREBASE_CONFIG) {
+                firebase.initializeApp(CONFIG.FIREBASE_CONFIG);
+                window.firebaseDatabase = firebase.database();
+                if (window.firebaseManager) {
+                    window.firebaseManager.database = window.firebaseDatabase;
+                }
+            }
+        });
+        
+        // Google Maps callback
+        function initMaps() {
+            if (window.mapsManager) {
+                window.mapsManager.initMaps();
+            }
+        }
+    </script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&libraries=places,directions&callback=initMaps"></script>
+</body>
+</html>
+
